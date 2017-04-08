@@ -207,6 +207,7 @@ void sr_handlepacket(struct sr_instance* sr, uint8_t* packet, unsigned int len, 
     // ethernet frame
     sr_ethernet_hdr_t* eth_h = NULL;
     memcpy(eth_h, packet, ETH_HEADER_LENGTH);
+    print_hdr_eth(eth_h);
     
     // ip packet
     if(eth_h->ether_type == ethertype_ip)
