@@ -92,6 +92,8 @@ int check_ip_packet_valid(sr_ip_hdr_t *ip_hdr, unsigned int len)
         fprintf (stderr, "Dropping ip packet. Corrupted checksum.\n");
         return 0;
     }
+
+    ip_hdr->ip_sum = checksum;
     return 1;
 }
 
@@ -302,10 +304,10 @@ void sr_handlepacket(struct sr_instance* sr, uint8_t* packet, unsigned int len, 
             {
 		printf("tcp/udp packet\n");                
 		sr_icmp_t3_hdr_t* icmp_unreach = malloc(sizeof(sr_icmp_t3_hdr_t));
-                icmp_unreach->icmp_code = 1; // host unreachable
+                icmp_unreach->icmp_code = 3; // host unreachable
                 icmp_unreach->icmp_type = 3; // icmp unreachable
                 icmp_unreach->icmp_sum = 0; // set checksum to zero
-		memcpy(icmp_unreach->data, ip_h, ICMP_DATA_SIZE);
+		memcpy(icmp_unreach->data, packet + ETH_HEADER_LENGTH, ICMP_DATA_SIZE);
                 icmp_unreach->icmp_sum = cksum((void*)icmp_unreach, sizeof(sr_icmp_t3_hdr_t)); 
                 
                 uint8_t* tmp = malloc(6);
